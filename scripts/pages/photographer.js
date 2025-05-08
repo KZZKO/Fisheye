@@ -119,3 +119,5 @@ function displayMedia(mediaList) {
 }
 
 updatePageTitle();
+
+// TODO: Finir le filtre et la gallery
