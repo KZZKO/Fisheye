@@ -1,8 +1,10 @@
+import getPhotographers from "./index.js"
+
 // Fonction pour mettre à jour le titre de la page et les informations du photographe
 async function updatePageTitle() {
-    const { photographers, media } = await getData();
-    const photographerId = new URLSearchParams(window.location.search).get('id');
+    const { photographers, media } = await getPhotographers();
 
+    const photographerId = new URLSearchParams(window.location.search).get('id');
     const photographerData = photographers.find(p => p.id == photographerId);
 
     if (photographerData) {
@@ -22,25 +24,6 @@ async function updatePageTitle() {
     } else {
         console.log('Page 404: Photographe non trouvé');
         document.querySelector('#error-message').textContent = "Photographe non trouvé.";
-    }
-}
-
-// Fonction pour obtenir les données
-async function getData() {
-    try {
-        const response = await fetch('data/photographers.json');
-        const data = await response.json();
-        return {
-            photographers: data.photographers,
-            media: data.media
-        };
-    } catch (error) {
-        console.error('Erreur lors du chargement des données :', error);
-        document.querySelector('#error-message').textContent = "Désolé, une erreur est survenue lors du chargement des données.";
-        return {
-            photographers: [],
-            media: []
-        };
     }
 }
 

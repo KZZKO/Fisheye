@@ -1,17 +1,25 @@
-async function getPhotographers() {
+import photographerTemplate from "../templates/photographer.js";
+
+export default async function getPhotographers() {
     try {
         const response = await fetch('data/photographers.json');
         const data = await response.json();
-        return { photographers: data.photographers };
+        return {
+            photographers: data.photographers,
+            media: data.media
+        };
     } catch (error) {
-        console.error('Erreur lors du chargement des photographes :', error);
-        return { photographers: [] };
+        console.error('Erreur lors du chargement des données :', error);
+        document.querySelector('#error-message').textContent = "Désolé, une erreur est survenue lors du chargement des données.";
+        return {
+            photographers: [],
+            media: []
+        };
     }
 }
 
-async function displayData(photographers) {
+function displayData(photographers) {
     const photographersSection = document.querySelector(".photographer_section");
-
     photographers.forEach((photographer) => {
         const photographerModel = photographerTemplate(photographer);
         const userCardDOM = photographerModel.getUserCardDOM();
@@ -25,4 +33,6 @@ async function init() {
     displayData(photographers);
 }
 
-init();
+if (document.querySelector(".photographer_section")) {
+    init();
+}
