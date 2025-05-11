@@ -6,6 +6,9 @@
   <meta charset="utf-8">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <link href="https://fonts.googleapis.com/css?family=DM+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <title>Fisheye - photographe </title>
 </head>
 
@@ -34,15 +37,25 @@
   <div id="contact_modal">
     <div class="modal">
       <header>
-        <h2>Contactez-moi</h2>
+        <h2>Contactez-moi <span id="modal-photographer-name"></span></h2>
         <img src="assets/icons/close.svg" onclick="closeModal()" />
       </header>
       <form>
         <div>
-          <label>Prénom</label>
-          <input />
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" name="prenom" placeholder="Prénom" maxlength="30" required>
+
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" name="nom" placeholder="Nom" maxlength="30" required>
+
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Email" maxlength="50" required>
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Entrer votre message" maxlength="700"
+            required></textarea>
         </div>
-        <button class="contact_button">Envoyer</button>
+        <button class="contact_button" onclick="submitcontact(event)">Envoyer</button>
       </form>
     </div>
   </div>

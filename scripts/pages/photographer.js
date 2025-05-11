@@ -30,6 +30,7 @@ async function updatePageTitle() {
 // Fonction pour afficher le tri
 function displaySortDropdown(mediaList, photographerName) {
     const container = document.createElement('div');
+    container.classList.add('filter');
     container.innerHTML = `
         <label for="sort-select">Trier par</label>
         <select id="sort-select">
@@ -119,7 +120,7 @@ function displayMedia(mediaList, photographerName) {
             ${mediaTag}
             <div class="media-info">
                 <h3>${media.title}</h3>
-                <p>${media.likes} ❤️</p>
+                <p>${media.likes} <i class="fa-solid fa-heart"></i></p>
             </div>
         `;
         albumContainer.appendChild(mediaElement);
@@ -129,11 +130,7 @@ function displayMedia(mediaList, photographerName) {
 updatePageTitle();
 
 // TODO: 
-// Réduire de taille les images et convertir en webp
-// Changer le coeur par une icon fontawesome
-// Faire le css du filtre
-// Faire le css de la gallery
+// Faire l'incrémentation de like sur les photos
 // Faire la modal de visualisation des images et vidéos
-// Faire la modal contact et régler son ouverture
 // Faire le petit encadrer en bas à droite
 // Faire l'accessibilité

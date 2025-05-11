@@ -9,7 +9,8 @@
     flex-direction: row;
     background-color: #FAFAFA;
     height: 300px;
-    margin: 0 100px;
+    width: 85%;
+    margin: 0 auto;
     padding: 0 40px;
     border-radius: 10px;
 }
@@ -86,30 +87,100 @@
     cursor: pointer;
 }
 
-.photographe-album {
-    display: grid;
-    grid-template-columns: repeat(3, 500px);
-    justify-content: center;
+.filter {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    margin: 50px 0;
+    width: 230px;
+    margin: 25px 105px;
+}
+
+.filter label {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.filter select {
+    font-size: 1.1em;
+    padding: 15px 20px;
+    color: white;
+    background-color: #901C1C;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.4s ease;
+}
+
+.filter select:hover {
+    background-color: #D3573C;
+    color: black;
+    cursor: pointer;
+}
+
+#photographe-album {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    justify-content: space-between;
+    align-items: center;
+    width: 89.2%;
+    gap: 100px;
+    margin: 40px auto;
+}
+
+.media-card {
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 500px;
+    cursor: pointer;
+}
+
+.media-card img,
+video {
+    width: 100%;
+    height: 90%;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.media-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 30px;
+    color: #901C1C;
+    font-size: 1.2em;
+}
+
+.media-info p {
+    font-size: 1.3em;
 }
 
 .modal {
     border-radius: 5px;
     background-color: #DB8876;
-    width: 50%;
+    width: 30%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     padding: 35px;
     margin: auto;
+    position: fixed;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .modal header {
     justify-content: space-between;
     width: 100%;
+    margin-bottom: 30px;
 }
 
 .modal header img {
@@ -117,9 +188,12 @@
 }
 
 .modal header h2 {
-    font-size: 64px;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 3.5em;
     font-weight: normal;
     text-align: center;
+    width: 100%;
 }
 
 form {
@@ -145,6 +219,19 @@ form div {
 form input {
     width: 100%;
     height: 68px;
+    border: none;
+    border-radius: 5px;
+}
+
+form input,
+textarea::placeholder {
+    font-size: 1.5em;
+}
+
+form textarea {
+    width: 100%;
+    height: 170px;
+    resize: none;
     border: none;
     border-radius: 5px;
 }
