@@ -1,4 +1,5 @@
 import getPhotographers from "./index.js"
+import photographerTemplate from "../templates/photographer.js";
 
 // Fonction pour mettre à jour le titre de la page et les informations du photographe
 async function updatePageTitle() {

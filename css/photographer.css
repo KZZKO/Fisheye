@@ -135,7 +135,6 @@
     flex-direction: column;
     width: 100%;
     height: 500px;
-    cursor: pointer;
 }
 
 .media-card img,
@@ -144,6 +143,7 @@ video {
     height: 90%;
     border-radius: 10px;
     object-fit: cover;
+    cursor: pointer;
 }
 
 .media-info {
@@ -158,6 +158,20 @@ video {
 
 .media-info p {
     font-size: 1.3em;
+}
+
+.media-info i {
+    cursor: pointer;
+}
+
+.photographe-tab {
+    position: fixed;
+    bottom: 0;
+    right: 30px;
+    width: 350px;
+    height: 60px;
+    background: #DB8876;
+    border-radius: 5px 5px 0 0;
 }
 
 .modal {
@@ -234,4 +248,11 @@ form textarea {
     resize: none;
     border: none;
     border-radius: 5px;
+}
+
+.form-error {
+    color: #901C1C;
+    font-size: 0.85em;
+    margin-top: 4px;
+    margin-bottom: 5px;
 }
