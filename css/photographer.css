@@ -168,10 +168,33 @@ video {
     position: fixed;
     bottom: 0;
     right: 30px;
-    width: 350px;
-    height: 60px;
-    background: #DB8876;
-    border-radius: 5px 5px 0 0;
+    background-color: #DB8876;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 999;
+}
+
+.photograph-likes-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 50px;
+}
+
+.photograph-likes-price i.fa-heart {
+    font-size: 0.9em;
+    color: black;
+}
+
+.photograph-likes-price .price {
+    font-size: 1em;
+    color: black;
 }
 
 .modal {

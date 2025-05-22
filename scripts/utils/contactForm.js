@@ -58,8 +58,6 @@ function submitcontact(event) {
         isValid = false;
     }
 
-    clearErrors();
-
     if (!validateEmail(email)) {
         showError(emailInput, 'Veuillez entrer un email valide.');
         isValid = false;
