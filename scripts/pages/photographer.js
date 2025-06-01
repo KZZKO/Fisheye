@@ -1,6 +1,11 @@
 import getPhotographers from "./index.js";
 
-// Fonction pour mettre à jour le titre de la page et les informations du photographe
+// Modal media globale (pour visualisation images/vidéos)
+let modalIndex = 0;
+let modalMediaList = [];
+let modalPhotographerName = "";
+
+// Mise à jour du titre, infos photographe + affichage média
 async function updatePageTitle() {
     const { photographers, media } = await getPhotographers();
 
@@ -14,29 +19,35 @@ async function updatePageTitle() {
         document.querySelector('#photographer-tagline').textContent = photographerData.tagline;
         document.querySelector('#photographer-picture').setAttribute('src', `assets/photographers/${photographerData.portrait}`);
 
+        modalPhotographerName = photographerData.name;
+
         const photographerMedia = media.filter(m => m.photographerId == photographerId);
+        modalMediaList = photographerMedia;
 
         displaySortDropdown(photographerMedia, photographerData.name);
 
-        // Trier les médias par popularité dès le début et les afficher
+        // Tri initial par popularité
         const sortedMedia = sortMedia(photographerMedia, "popularity");
         displayMedia(sortedMedia, photographerData.name);
 
-        // Afficher le badge des likes et du prix
         displayLikesAndPriceBadge(photographerMedia, photographerData.price);
+
+        // Mettre à jour le nom dans la modal de contact
+        document.getElementById('modal-photographer-name').textContent = photographerData.name;
+
     } else {
         console.log('Page 404: Photographe non trouvé');
         document.querySelector('#error-message').textContent = "Photographe non trouvé.";
     }
 }
 
-// Fonction pour afficher le tri
+// Affiche le select de tri
 function displaySortDropdown(mediaList, photographerName) {
     const container = document.createElement('div');
     container.classList.add('filter');
     container.innerHTML = `
         <label for="sort-select">Trier par</label>
-        <select id="sort-select">
+        <select id="sort-select" aria-label="Trier les médias">
             <option value="popularity" selected>Popularité</option>
             <option value="date">Date</option>
             <option value="title">Titre</option>
@@ -59,7 +70,7 @@ function displaySortDropdown(mediaList, photographerName) {
     }
 }
 
-// Fonction pour trier les médias en fonction du critère sélectionné
+// Trie selon critère
 function sortMedia(mediaList, criterion) {
     if (!mediaList || mediaList.length === 0) {
         console.error('Aucun média trouvé.');
@@ -79,7 +90,7 @@ function sortMedia(mediaList, criterion) {
     return sortedMedia;
 }
 
-// Fonction pour afficher les médias triés avec gestion des likes cliquables
+// Affiche les médias et active gestion likes + ouverture modal media
 function displayMedia(mediaList, photographerName) {
     const albumContainer = document.querySelector('#photographe-album');
     if (!albumContainer) {
@@ -89,11 +100,11 @@ function displayMedia(mediaList, photographerName) {
     albumContainer.innerHTML = '';
 
     if (!mediaList || mediaList.length === 0) {
-        console.log("Aucun média à afficher.");
+        albumContainer.textContent = "Aucun média à afficher.";
         return;
     }
 
-    mediaList.forEach(media => {
+    mediaList.forEach((media, index) => {
         const photographerFolder = photographerName.split(' ')[0];
 
         let mediaSrc;
@@ -105,12 +116,11 @@ function displayMedia(mediaList, photographerName) {
 
         let mediaTag;
         if (media.image) {
-            mediaTag = `<img src="${mediaSrc}" alt="${media.title}" />`;
+            mediaTag = `<img src="${mediaSrc}" alt="${media.title}" tabindex="0" role="button" aria-label="Voir ${media.title} en grand" data-index="${index}"/>`;
         } else if (media.video) {
-            mediaTag = `<video controls><source src="${mediaSrc}" type="video/mp4"></video>`;
+            mediaTag = `<video controls tabindex="0" role="button" aria-label="Voir la vidéo ${media.title} en grand" data-index="${index}"><source src="${mediaSrc}" type="video/mp4"></video>`;
         }
 
-        // Si la propriété liked n'existe pas encore, on l'initialise à false
         if (media.liked === undefined) {
             media.liked = false;
         }
@@ -130,11 +140,11 @@ function displayMedia(mediaList, photographerName) {
         albumContainer.appendChild(mediaElement);
     });
 
-    // Ajouter gestion des likes après affichage
     addLikeListeners(mediaList);
+    addMediaModalListeners(mediaList);
 }
 
-// Fonction pour ajouter les cœurs des médias
+// Gestion des clics sur les cœurs
 function addLikeListeners(mediaList) {
     const likeIcons = document.querySelectorAll('.like-icon');
 
@@ -144,7 +154,6 @@ function addLikeListeners(mediaList) {
             toggleLike(mediaId, mediaList);
         });
 
-        // Pour accessibilité clavier (Entrée / Espace)
         icon.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -155,33 +164,24 @@ function addLikeListeners(mediaList) {
     });
 }
 
-// Fonction pour basculer like/unlike et mettre à jour l’interface
+// Toggle like / unlike
 function toggleLike(mediaId, mediaList) {
     const media = mediaList.find(m => m.id == mediaId);
     if (!media) return;
 
     media.liked = !media.liked;
+    media.likes += media.liked ? 1 : -1;
 
-    if (media.liked) {
-        media.likes++;
-    } else {
-        media.likes--;
-    }
-
-    // Mise à jour compteur like sur la carte média
     const mediaElement = document.querySelector(`.like-icon[data-media-id="${mediaId}"]`);
     if (mediaElement) {
         const likeCountElement = mediaElement.previousElementSibling;
-        if (likeCountElement) {
-            likeCountElement.textContent = media.likes;
-        }
+        if (likeCountElement) likeCountElement.textContent = media.likes;
     }
 
-    // Mise à jour du badge total
     updateTotalLikes(mediaList);
 }
 
-// Fonction pour afficher le badge de likes total + tarif journalier
+// Affiche le badge likes total + prix
 function displayLikesAndPriceBadge(mediaList, pricePerDay) {
     const tabContainer = document.querySelector('.photographe-tab');
     if (!tabContainer) {
@@ -191,8 +191,8 @@ function displayLikesAndPriceBadge(mediaList, pricePerDay) {
 
     const totalLikes = mediaList.reduce((sum, media) => sum + (media.likes || 0), 0);
 
-    const badgeHTML = `
-        <div class="photograph-likes-price">
+    tabContainer.innerHTML = `
+        <div class="photograph-likes-price" aria-live="polite">
             <span class="total-likes">
                 <span id="likes-total">${totalLikes}</span>
                 <i class="fa-solid fa-heart" aria-label="likes"></i>
@@ -200,11 +200,9 @@ function displayLikesAndPriceBadge(mediaList, pricePerDay) {
             <span class="price">${pricePerDay}€ / jour</span>
         </div>
     `;
-
-    tabContainer.innerHTML = badgeHTML;
 }
 
-// Fonction pour mettre à jour le total des likes dans le badge
+// Met à jour total likes dans le badge
 function updateTotalLikes(mediaList) {
     const totalLikes = mediaList.reduce((sum, media) => sum + (media.likes || 0), 0);
     const totalLikesElement = document.getElementById('likes-total');
@@ -213,16 +211,138 @@ function updateTotalLikes(mediaList) {
     }
 }
 
-// Utilitaire (pour le tri dynamique)
+// Récupère le prix du photographe affiché
 function getPhotographerPrice() {
-    const photographerPriceElement = document.querySelector('.photographe-tab .price');
-    if (!photographerPriceElement) return 0;
-    const priceText = photographerPriceElement.textContent;
+    const priceEl = document.querySelector('.photographe-tab .price');
+    if (!priceEl) return 0;
+    const priceText = priceEl.textContent;
     return parseInt(priceText) || 0;
 }
 
-updatePageTitle();
+// ------------------
+// MODAL VISUALISATION MÉDIA
+// ------------------
 
-// TODO: 
-// Faire la modal de visualisation des images et vidéos
-// Faire l'accessibilité
+// Création dynamique de la modal média (une seule modal globale)
+function createMediaModal() {
+    if (document.getElementById('media_modal')) return;
+
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'media_modal';
+    modalDiv.classList.add('media-modal');
+    modalDiv.setAttribute('aria-hidden', 'true');
+    modalDiv.setAttribute('role', 'dialog');
+    modalDiv.setAttribute('aria-label', 'Visualisation média');
+    modalDiv.innerHTML = `
+        <button class="prev-media fa-solid fa-chevron-left" aria-label="Média précédent"></button>
+        <div class="media-content" tabindex="0"></div>
+        <button class="next-media fa-solid fa-chevron-right" aria-label="Média suivant"></button>
+        <button class="close-modal fa-solid fa-xmark" aria-label="Fermer la modal"></button>
+    `;
+
+    document.body.appendChild(modalDiv);
+
+    // Listeners boutons
+    modalDiv.querySelector('.close-modal').addEventListener('click', closeMediaModal);
+    modalDiv.querySelector('.prev-media').addEventListener('click', showPreviousMedia);
+    modalDiv.querySelector('.next-media').addEventListener('click', showNextMedia);
+
+    // Gestion clavier
+    modalDiv.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMediaModal();
+        if (e.key === 'ArrowLeft') showPreviousMedia();
+        if (e.key === 'ArrowRight') showNextMedia();
+    });
+}
+
+// Ouvre la modal et affiche média index donné
+function openMediaModal(index) {
+    createMediaModal();
+    modalIndex = index;
+
+    const modalDiv = document.getElementById('media_modal');
+    modalDiv.setAttribute('aria-hidden', 'false');
+    modalDiv.style.display = 'flex';
+
+    displayModalMedia(modalIndex);
+
+    // Focus sur le contenu média
+    modalDiv.querySelector('.media-content').focus();
+}
+
+// Ferme modal
+function closeMediaModal() {
+    const modalDiv = document.getElementById('media_modal');
+    if (!modalDiv) return;
+
+    modalDiv.setAttribute('aria-hidden', 'true');
+    modalDiv.style.display = 'none';
+
+    // Focus retour sur le premier média (ou autre élément)
+    const albumContainer = document.querySelector('#photographe-album');
+    if (albumContainer) albumContainer.querySelector('img, video')?.focus();
+}
+
+// Affiche média actuel dans modal
+function displayModalMedia(index) {
+    const media = modalMediaList[index];
+    if (!media) return;
+
+    const modalContent = document.querySelector('#media_modal .media-content');
+    if (!modalContent) return;
+
+    const photographerFolder = modalPhotographerName.split(' ')[0];
+    let mediaSrc;
+    let mediaHtml = '';
+
+    if (media.image) {
+        mediaSrc = `assets/albums/${photographerFolder}/${media.image}`;
+        mediaHtml = `<img src="${mediaSrc}" alt="${media.title}" />`;
+    } else if (media.video) {
+        mediaSrc = `assets/albums/${photographerFolder}/${media.video}`;
+        mediaHtml = `<video controls autoplay><source src="${mediaSrc}" type="video/mp4"></video>`;
+    }
+
+    modalContent.innerHTML = `
+        <h3 class="modal-media-title">${media.title}</h3>
+        ${mediaHtml}
+    `;
+}
+
+// Affiche média précédent
+function showPreviousMedia() {
+    modalIndex = (modalIndex - 1 + modalMediaList.length) % modalMediaList.length;
+    displayModalMedia(modalIndex);
+}
+
+// Affiche média suivant
+function showNextMedia() {
+    modalIndex = (modalIndex + 1) % modalMediaList.length;
+    displayModalMedia(modalIndex);
+}
+
+// Ajoute gestion clic + clavier pour ouvrir modal media
+function addMediaModalListeners(mediaList) {
+    const albumContainer = document.querySelector('#photographe-album');
+    if (!albumContainer) return;
+
+    // Cibler les images et vidéos avec tabindex et data-index
+    const mediaElements = albumContainer.querySelectorAll('img[role="button"], video[role="button"]');
+
+    mediaElements.forEach(el => {
+        el.addEventListener('click', () => {
+            const index = parseInt(el.getAttribute('data-index'));
+            openMediaModal(index);
+        });
+
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const index = parseInt(el.getAttribute('data-index'));
+                openMediaModal(index);
+            }
+        });
+    });
+}
+
+updatePageTitle();
