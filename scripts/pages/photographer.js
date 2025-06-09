@@ -92,6 +92,9 @@ function sortMedia(mediaList, criterion) {
 
 // Affiche les médias et active gestion likes + ouverture modal media
 function displayMedia(mediaList, photographerName) {
+    // Met à jour la liste globale utilisée par la modal
+    modalMediaList = mediaList;
+
     const albumContainer = document.querySelector('#photographe-album');
     if (!albumContainer) {
         console.error("Conteneur des albums introuvable.");
@@ -116,9 +119,9 @@ function displayMedia(mediaList, photographerName) {
 
         let mediaTag;
         if (media.image) {
-            mediaTag = `<img src="${mediaSrc}" alt="${media.title}" tabindex="0" role="button" aria-label="Voir ${media.title} en grand" data-index="${index}"/>`;
+            mediaTag = `<img src="${mediaSrc}" alt="${media.title}" data-index="${index}"/>`;
         } else if (media.video) {
-            mediaTag = `<video controls tabindex="0" role="button" aria-label="Voir la vidéo ${media.title} en grand" data-index="${index}"><source src="${mediaSrc}" type="video/mp4"></video>`;
+            mediaTag = `<video controls data-index="${index}"><source src="${mediaSrc}" type="video/mp4"></video>`;
         }
 
         if (media.liked === undefined) {
@@ -128,20 +131,20 @@ function displayMedia(mediaList, photographerName) {
         const mediaElement = document.createElement('article');
         mediaElement.classList.add('media-card');
         mediaElement.innerHTML = `
-            ${mediaTag}
-            <div class="media-info">
-                <h3>${media.title}</h3>
-                <p>
-                    <span class="like-count">${media.likes}</span>
-                    <i class="fa-solid fa-heart like-icon" tabindex="0" role="button" aria-label="Ajouter un like" data-media-id="${media.id}"></i>
-                </p>
-            </div>
+          ${mediaTag}
+          <div class="media-info">
+            <h3>${media.title}</h3>
+            <p>
+              <span class="like-count">${media.likes}</span>
+              <i class="fa-solid fa-heart like-icon" data-media-id="${media.id}"></i>
+            </p>
+          </div>
         `;
         albumContainer.appendChild(mediaElement);
     });
 
     addLikeListeners(mediaList);
-    addMediaModalListeners(mediaList);
+    enableMediaModalOpening();
 }
 
 // Gestion des clics sur les cœurs
@@ -152,14 +155,6 @@ function addLikeListeners(mediaList) {
         icon.addEventListener('click', () => {
             const mediaId = icon.getAttribute('data-media-id');
             toggleLike(mediaId, mediaList);
-        });
-
-        icon.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const mediaId = icon.getAttribute('data-media-id');
-                toggleLike(mediaId, mediaList);
-            }
         });
     });
 }
@@ -219,130 +214,71 @@ function getPhotographerPrice() {
     return parseInt(priceText) || 0;
 }
 
-// ------------------
-// MODAL VISUALISATION MÉDIA
-// ------------------
-
-// Création dynamique de la modal média (une seule modal globale)
-function createMediaModal() {
-    if (document.getElementById('media_modal')) return;
-
-    const modalDiv = document.createElement('div');
-    modalDiv.id = 'media_modal';
-    modalDiv.classList.add('media-modal');
-    modalDiv.setAttribute('aria-hidden', 'true');
-    modalDiv.setAttribute('role', 'dialog');
-    modalDiv.setAttribute('aria-label', 'Visualisation média');
-    modalDiv.innerHTML = `
-        <button class="prev-media fa-solid fa-chevron-left" aria-label="Média précédent"></button>
-        <div class="media-content" tabindex="0"></div>
-        <button class="next-media fa-solid fa-chevron-right" aria-label="Média suivant"></button>
-        <button class="close-modal fa-solid fa-xmark" aria-label="Fermer la modal"></button>
-    `;
-
-    document.body.appendChild(modalDiv);
-
-    // Listeners boutons
-    modalDiv.querySelector('.close-modal').addEventListener('click', closeMediaModal);
-    modalDiv.querySelector('.prev-media').addEventListener('click', showPreviousMedia);
-    modalDiv.querySelector('.next-media').addEventListener('click', showNextMedia);
-
-    // Gestion clavier
-    modalDiv.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMediaModal();
-        if (e.key === 'ArrowLeft') showPreviousMedia();
-        if (e.key === 'ArrowRight') showNextMedia();
-    });
-}
-
-// Ouvre la modal et affiche média index donné
-function openMediaModal(index) {
-    createMediaModal();
-    modalIndex = index;
-
-    const modalDiv = document.getElementById('media_modal');
-    modalDiv.setAttribute('aria-hidden', 'false');
-    modalDiv.style.display = 'flex';
-
-    displayModalMedia(modalIndex);
-
-    // Focus sur le contenu média
-    modalDiv.querySelector('.media-content').focus();
-}
-
-// Ferme modal
-function closeMediaModal() {
-    const modalDiv = document.getElementById('media_modal');
-    if (!modalDiv) return;
-
-    modalDiv.setAttribute('aria-hidden', 'true');
-    modalDiv.style.display = 'none';
-
-    // Focus retour sur le premier média (ou autre élément)
-    const albumContainer = document.querySelector('#photographe-album');
-    if (albumContainer) albumContainer.querySelector('img, video')?.focus();
-}
-
-// Affiche média actuel dans modal
-function displayModalMedia(index) {
-    const media = modalMediaList[index];
-    if (!media) return;
-
-    const modalContent = document.querySelector('#media_modal .media-content');
-    if (!modalContent) return;
-
-    const photographerFolder = modalPhotographerName.split(' ')[0];
-    let mediaSrc;
-    let mediaHtml = '';
-
-    if (media.image) {
-        mediaSrc = `assets/albums/${photographerFolder}/${media.image}`;
-        mediaHtml = `<img src="${mediaSrc}" alt="${media.title}" />`;
-    } else if (media.video) {
-        mediaSrc = `assets/albums/${photographerFolder}/${media.video}`;
-        mediaHtml = `<video controls autoplay><source src="${mediaSrc}" type="video/mp4"></video>`;
-    }
-
-    modalContent.innerHTML = `
-        <h3 class="modal-media-title">${media.title}</h3>
-        ${mediaHtml}
-    `;
-}
-
-// Affiche média précédent
-function showPreviousMedia() {
-    modalIndex = (modalIndex - 1 + modalMediaList.length) % modalMediaList.length;
-    displayModalMedia(modalIndex);
-}
-
-// Affiche média suivant
-function showNextMedia() {
-    modalIndex = (modalIndex + 1) % modalMediaList.length;
-    displayModalMedia(modalIndex);
-}
-
-// Ajoute gestion clic + clavier pour ouvrir modal media
-function addMediaModalListeners(mediaList) {
-    const albumContainer = document.querySelector('#photographe-album');
-    if (!albumContainer) return;
-
-    // Cibler les images et vidéos avec tabindex et data-index
-    const mediaElements = albumContainer.querySelectorAll('img[role="button"], video[role="button"]');
-
-    mediaElements.forEach(el => {
-        el.addEventListener('click', () => {
-            const index = parseInt(el.getAttribute('data-index'));
-            openMediaModal(index);
-        });
-
-        el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const index = parseInt(el.getAttribute('data-index'));
+// Active l'ouverture de la modale média via clic simple (pas de clavier)
+function enableMediaModalOpening() {
+    const mediaElements = document.querySelectorAll('.media-card img, .media-card video');
+    mediaElements.forEach((element) => {
+        element.addEventListener('click', () => {
+            const index = parseInt(element.getAttribute('data-index'), 10);
+            if (!isNaN(index)) {
                 openMediaModal(index);
             }
         });
     });
 }
 
-updatePageTitle();
+// --- MODALE MEDIA ---
+
+const modal = document.getElementById('media-modal');
+const modalContent = modal.querySelector('.media-content');
+const btnClose = modal.querySelector('.close-modal');
+const btnPrev = modal.querySelector('.left-arrow');
+const btnNext = modal.querySelector('.right-arrow');
+
+function openMediaModal(index) {
+    modalIndex = index;
+    renderModalContent(modalMediaList[modalIndex]);
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    modal.focus();
+}
+
+function closeMediaModal() {
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    modalContent.innerHTML = '';
+}
+
+btnClose.addEventListener('click', closeMediaModal);
+
+btnPrev.addEventListener('click', () => {
+    modalIndex = (modalIndex - 1 + modalMediaList.length) % modalMediaList.length;
+    renderModalContent(modalMediaList[modalIndex]);
+});
+
+btnNext.addEventListener('click', () => {
+    modalIndex = (modalIndex + 1) % modalMediaList.length;
+    renderModalContent(modalMediaList[modalIndex]);
+});
+
+function renderModalContent(media) {
+    const photographerFolder = modalPhotographerName.split(' ')[0];
+    let html = '';
+    if (media.image) {
+        const src = `assets/albums/${photographerFolder}/${media.image}`;
+        html = `<img src="${src}" alt="${media.title}">`;
+    } else if (media.video) {
+        const src = `assets/albums/${photographerFolder}/${media.video}`;
+        html = `<video controls><source src="${src}" type="video/mp4"></video>`;
+    }
+    modalContent.innerHTML = html;
+
+    // Ici on ajoute le titre du média dans la div .media-title
+    const mediaTitleDiv = document.querySelector('.media-title');
+    if (mediaTitleDiv) {
+        mediaTitleDiv.textContent = media.title || '';
+    }
+}
+
+// Appelle updatePageTitle() quand la page est prête
+document.addEventListener('DOMContentLoaded', updatePageTitle);
