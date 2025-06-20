@@ -12,6 +12,12 @@ header {
     justify-content: space-between;
     align-items: center;
     height: 90px;
+    width: 80%;
+    margin: 0 auto;
+}
+
+header a {
+    margin-left: 140px;
 }
 
 h1 {
@@ -21,7 +27,6 @@ h1 {
 
 .logo {
     height: 50px;
-    margin-left: 100px;
 }
 
 .photographer_section {

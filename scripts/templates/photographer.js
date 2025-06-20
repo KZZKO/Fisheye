@@ -5,12 +5,25 @@ export default function photographerTemplate(data) {
 
     function getUserCardDOM() {
         const article = document.createElement('article');
+        article.setAttribute('tabindex', '0');
+        article.setAttribute('role', 'link');
+        article.setAttribute('aria-label', `Voir la page du photographe ${name}`);
+
+        // Redirection avec la souris
         article.addEventListener('click', () => {
             window.location.href = `photographer.html?id=${id}`;
         });
 
+        // Redirection avec le clavier (Entrée)
+        article.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                window.location.href = `photographer.html?id=${id}`;
+            }
+        });
+
         const img = document.createElement('img');
         img.setAttribute("src", picture);
+        img.setAttribute("alt", `Portrait de ${name}`);
 
         const h2 = document.createElement('h2');
         h2.classList.add('name');

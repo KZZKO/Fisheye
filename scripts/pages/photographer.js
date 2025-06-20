@@ -269,7 +269,7 @@ function renderModalContent(media) {
         html = `<img src="${src}" alt="${media.title}">`;
     } else if (media.video) {
         const src = `assets/albums/${photographerFolder}/${media.video}`;
-        html = `<video controls><source src="${src}" type="video/mp4"></video>`;
+        html = `<video controls autoplay><source src="${src}" type="video/mp4"></video>`;
     }
     modalContent.innerHTML = html;
 
