@@ -1,21 +1,24 @@
 export default function photographerTemplate(data) {
     const { name, portrait, city, country, tagline, price, id } = data;
-
     const picture = `assets/photographers/${portrait}`;
 
     function getUserCardDOM() {
         const article = document.createElement('article');
         article.setAttribute('tabindex', '0');
-        article.setAttribute('role', 'link');
-        article.setAttribute('aria-label', `Voir la page du photographe ${name}`);
+        article.setAttribute('aria-label', `Carte du photographe ${name}`);
 
-        // Redirection avec la souris
-        article.addEventListener('click', () => {
+        // Bloc lien focusable (img + h2)
+        const linkContainer = document.createElement('div');
+        linkContainer.classList.add('photographertop');
+        linkContainer.setAttribute('tabindex', '0');
+        linkContainer.setAttribute('role', 'link');
+        linkContainer.setAttribute('aria-label', `Voir la page du photographe ${name}`);
+
+        linkContainer.addEventListener('click', () => {
             window.location.href = `photographer.html?id=${id}`;
         });
 
-        // Redirection avec le clavier (Entrée)
-        article.addEventListener('keypress', (e) => {
+        linkContainer.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 window.location.href = `photographer.html?id=${id}`;
             }
@@ -29,6 +32,15 @@ export default function photographerTemplate(data) {
         h2.classList.add('name');
         h2.textContent = name;
 
+        linkContainer.appendChild(img);
+        linkContainer.appendChild(h2);
+
+        // Bloc texte (ville, slogan, prix)
+        const textContainer = document.createElement('div');
+        textContainer.classList.add('photographerbot');
+        textContainer.setAttribute('tabindex', '0');
+        textContainer.setAttribute('aria-label', `Informations de ${name}`);
+
         const countryCityContainer = document.createElement('p');
         countryCityContainer.classList.add('countrycity');
         countryCityContainer.textContent = `${city}, ${country}`;
@@ -41,11 +53,12 @@ export default function photographerTemplate(data) {
         priceContainer.classList.add('price');
         priceContainer.textContent = `${price}€/jour`;
 
-        article.appendChild(img);
-        article.appendChild(h2);
-        article.appendChild(countryCityContainer);
-        article.appendChild(taglineContainer);
-        article.appendChild(priceContainer);
+        textContainer.appendChild(countryCityContainer);
+        textContainer.appendChild(taglineContainer);
+        textContainer.appendChild(priceContainer);
+
+        article.appendChild(linkContainer);
+        article.appendChild(textContainer);
 
         return article;
     }
