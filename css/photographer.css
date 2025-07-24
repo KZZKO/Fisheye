@@ -305,7 +305,7 @@
     cursor: pointer;
 }
 
-.left-arrow i {
+.left-arrow span {
     font-size: 3em;
     color: #901C1C;
 }
@@ -321,7 +321,7 @@
     cursor: pointer;
 }
 
-.right-arrow i {
+.right-arrow span {
     font-size: 3em;
     color: #901C1C;
 }
@@ -337,7 +337,7 @@
     cursor: pointer;
 }
 
-.close-modal i {
+.close-modal span {
     font-size: 3em;
     color: #901C1C;
 }
