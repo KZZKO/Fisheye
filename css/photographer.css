@@ -96,6 +96,7 @@
 }
 
 .filter label {
+    width: 160px;
     font-size: 1.2em;
     font-weight: 700;
 }
@@ -387,4 +388,54 @@ form textarea {
     font-size: 0.85em;
     margin-top: 4px;
     margin-bottom: 5px;
+}
+
+.custom-select {
+    position: relative;
+    width: 100%;
+    background-color: #901C1C;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-select .selected {
+    padding: 15px 20px;
+    background-color: #901C1C;
+    border-radius: 5px;
+}
+
+.custom-select .select-options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    background-color: #901C1C;
+    border-radius: 0 0 5px 5px;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.custom-select .select-options.show {
+    display: block;
+}
+
+.custom-select .select-options li {
+    padding: 15px 20px;
+    border-top: 1px solid #D3573C;
+    color: white;
+    transition: background 0.3s;
+}
+
+.custom-select .select-options li:hover,
+.custom-select .select-options li:focus {
+    background-color: #D3573C;
+    color: black;
+    outline: none;
 }
