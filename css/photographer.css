@@ -402,6 +402,10 @@ form textarea {
 }
 
 .custom-select .selected {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     padding: 15px 20px;
     background-color: #901C1C;
     border-radius: 5px;
@@ -428,7 +432,7 @@ form textarea {
 
 .custom-select .select-options li {
     padding: 15px 20px;
-    border-top: 1px solid #D3573C;
+    border-top: 1px solid #ffffff;
     color: white;
     transition: background 0.3s;
 }
@@ -438,4 +442,13 @@ form textarea {
     background-color: #D3573C;
     color: black;
     outline: none;
+}
+
+.chevron-icon {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.chevron-icon.rotate {
+    transform: rotate(180deg);
 }

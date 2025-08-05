@@ -70,7 +70,7 @@ function displaySortDropdown(mediaList, photographerName) {
     selected.className = 'selected';
     selected.setAttribute('role', 'button');
     selected.setAttribute('aria-haspopup', 'listbox');
-    selected.textContent = 'Popularité';
+    selected.innerHTML = `Popularité <i class="fa-solid fa-chevron-down chevron-icon" aria-hidden="true"></i>`;
 
     const optionsList = document.createElement('ul');
     optionsList.className = 'select-options';
@@ -83,7 +83,6 @@ function displaySortDropdown(mediaList, photographerName) {
 
     const optionElements = [];
 
-    // Création des <li> pour chaque option
     options.forEach((opt) => {
         const li = document.createElement('li');
         li.textContent = opt.text;
@@ -97,9 +96,8 @@ function displaySortDropdown(mediaList, photographerName) {
         optionElements.push(li);
     });
 
-    // Fonction appelée quand une option est sélectionnée
     function selectOption(text, value) {
-        selected.textContent = text;
+        selected.innerHTML = `${text} <i class="fa-solid fa-chevron-down chevron-icon" aria-hidden="true"></i>`;
         closeDropdown();
         const sorted = sortMedia(mediaList, value);
         displayMedia(sorted, photographerName);
@@ -113,12 +111,18 @@ function displaySortDropdown(mediaList, photographerName) {
         customSelect.setAttribute('aria-expanded', 'true');
         focusedOptionIndex = 0;
         optionElements[focusedOptionIndex].focus();
+
+        const chevron = selected.querySelector('.chevron-icon');
+        if (chevron) chevron.classList.add('rotate');
     }
 
     function closeDropdown() {
         optionsList.classList.remove('show');
         customSelect.setAttribute('aria-expanded', 'false');
         focusedOptionIndex = -1;
+
+        const chevron = selected.querySelector('.chevron-icon');
+        if (chevron) chevron.classList.remove('rotate');
     }
 
     function toggleDropdown() {
@@ -129,13 +133,11 @@ function displaySortDropdown(mediaList, photographerName) {
         }
     }
 
-    // Ouvre/ferme le menu avec clic
     selected.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleDropdown();
     });
 
-    // Navigation au clavier
     customSelect.addEventListener('keydown', (e) => {
         const isOpen = optionsList.classList.contains('show');
 
@@ -160,7 +162,6 @@ function displaySortDropdown(mediaList, photographerName) {
         }
     });
 
-    // Ferme le menu si clic à l'extérieur
     document.addEventListener('click', (event) => {
         if (!customSelect.contains(event.target)) {
             closeDropdown();
